@@ -1,23 +1,8 @@
 version: "3"
 services:
-  ngrok:
-    image: ngrok/ngrok
-    container_name: ngrok-0
-    ports:
-      - "${NGROK_PORT_OUT}:${NGROK_PORT_IN}"
-    entrypoint: /bin/bash
-    command: [
-        "-c",
-        "echo \"version: 2\nweb_addr: 0.0.0.0:${NGROK_PORT_IN}\" > /var/lib/ngrok/ngrok.yml; \
-        /entrypoint.sh http aca-py:${ACAPY_ENDPOINT_PORT};",
-      ]
-    networks:
-      - agent-network
-    volumes:
-      - ./ngrok:/var/lib/ngrok
   aca-py:
     image: bcgovimages/aries-cloudagent:py36-1.16-1_1.0.0-rc0
-    container_name: aca-py-0
+    container_name: ${ACAPY_CONTAINER_NAME}
     depends_on:
       - wallet-db
     ports:
@@ -33,7 +18,7 @@ services:
         -it http '0.0.0.0' ${ACAPY_ENDPOINT_PORT} \
         -ot http \
         --admin '0.0.0.0' ${ACAPY_ADMIN_PORT} \
-        -e $(curl http://ngrok:${NGROK_PORT_IN}/api/tunnels | /var/lib/jq/jq -r .tunnels[0].public_url) \
+        -e http://${ACAPY_CONTAINER_NAME}:${ACAPY_ENDPOINT_PORT} \
         --wallet-type indy \
         --wallet-name ${WALLET_NAME}
         --wallet-key ${WALLET_KEY}
@@ -67,7 +52,7 @@ services:
       - ./jq:/var/lib/jq
   wallet-db:
     image: postgres:latest
-    container_name: wallet-db-0
+    container_name: ${WALLET_CONTAINER_NAME}
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
