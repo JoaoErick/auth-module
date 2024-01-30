@@ -16,5 +16,5 @@ sed -i "s/WALLET_CONTAINER_NAME=.*/WALLET_CONTAINER_NAME=wallet-db-0/" ./.env
 # Itera pela quantidade de módulos de autenticação para finalizá-los.
 for ((index = 1; index <= $counter; index++)); do
     docker-compose -p auth-module-$index down
-    echo "auth-module-$index interrompido!"
+    echo " auth-module-$index interrompido!"
 done

@@ -19,4 +19,4 @@ sed -i "s/ACAPY_CONTAINER_NAME=.*/ACAPY_CONTAINER_NAME=aca-py-$(($counter - 1))/
 sed -i "s/WALLET_CONTAINER_NAME=.*/WALLET_CONTAINER_NAME=wallet-db-$(($counter - 1))/" ./.env
 
 docker-compose -p auth-module-$counter down
-echo "auth-module-$counter interrompido!"
+echo " auth-module-$counter interrompido!"

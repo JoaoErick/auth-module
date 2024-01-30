@@ -23,3 +23,21 @@ sed -i "s/ACAPY_CONTAINER_NAME=.*/ACAPY_CONTAINER_NAME=aca-py-$(($counter + 1))/
 sed -i "s/WALLET_CONTAINER_NAME=.*/WALLET_CONTAINER_NAME=wallet-db-$(($counter + 1))/" ./.env
 
 docker-compose --project-name auth-module-$(($counter + 1)) up -d
+
+# Obtém o ID do último contêiner em execução com o nome base "aca-py"
+container_id=$(docker ps -a --filter "name=aca-py" --format "{{.ID}}" | head -n 1)
+
+# Se o ID do contêiner foi encontrado
+if [ -n "$container_id" ]; then
+    # Obtém o endereço IP do contêiner usando o ID obtido
+    container_ip=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $container_id)
+
+    # Se o endereço IP foi encontrado
+    if [ -n "$container_ip" ]; then
+        echo " Container aca-py-$(($counter + 1)): IP: $container_ip | PORT: $((7021 + $accumulator))"
+    else
+        echo "Unable to obtain the IP address of the aca-py container."
+    fi
+else
+    echo "No running aca-py containers found."
+fi
